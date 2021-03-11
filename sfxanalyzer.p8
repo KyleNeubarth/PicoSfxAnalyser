@@ -1,52 +1,39 @@
 pico-8 cartridge // http://www.pico-8.com
 version 29
 __lua__
---Kyle's sfx note analyzer
+#include sfxinfo.lua
+
+--Kyle's sfx note visualizer
 
 noteindex = 0
 sfxindex = 0
 
 info = {}
 
-function get_note(sfx, time)
-    local addr = 0x3200 + 68*sfxindex + 2*time
-    return { @addr , @(addr + 1) }
+function _init()
+    info = get_noteinfo(sfxindex,noteindex)
 end
 
 function _update()
-	if (btnp(5)) then
-		noteindex+=1
-		noteindex%=32
-        sfx( sfxindex, 1, noteindex, 1 )
+	--change note index
+  if (btnp(5)) then
+    noteindex+=1
+    noteindex%=32
+    sfx( sfxindex, 1, noteindex, 1 )
+    --update noteinfo
+    info = get_noteinfo(sfxindex,noteindex)
 	end
+    --change sfx
     if (btnp(0)) then
 		sfxindex-=1
 		sfxindex%=64
-        sfx(sfxindex,1)
+    sfx(sfxindex,1)
 	end
     if (btnp(1)) then
 		sfxindex+=1
 		sfxindex%=64
-        sfx(sfxindex,1)
+    sfx(sfxindex,1)
 	end
-	info = get_noteinfo(sfxindex,noteindex)
-end
-
-function get_noteinfo(sfx_num,note_num)
-    local addr = 0x3200 + 68*sfx_num + 2*note_num
-    local note = { @addr , @(addr + 1) }
-    noteinfo = {}
-    --add pitch
-    noteinfo.pitch = band(note[1],0x3f)
-    --add waveform
-    noteinfo.waveform = bor(band(shr(note[1],6),0x3),shl(band(note[2],0x1),2))
-    --add volume
-    noteinfo.volume = band(lshr(note[2],1),0x7)
-    --add effect
-    noteinfo.effect = band(lshr(note[2],4),0x7)
-    --add full bytes
-    noteinfo.fullbytes = bor(note[1],shl(note[2],8))
-    return noteinfo
 end
 
 function _draw()
@@ -57,7 +44,6 @@ function _draw()
     print("waveform:"..noteinfo.waveform,0,30)
     print("volume: "..noteinfo.volume,0,40)
     print("effect: "..noteinfo.effect,0,50)
-
 end
 
 __gfx__
