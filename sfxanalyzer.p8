@@ -17,9 +17,19 @@ function _update()
 	if (btnp(5)) then
 		noteindex+=1
 		noteindex%=32
+        sfx( sfxindex, 1, noteindex, 1 )
+	end
+    if (btnp(0)) then
+		sfxindex-=1
+		sfxindex%=64
+        sfx(sfxindex,1)
+	end
+    if (btnp(1)) then
+		sfxindex+=1
+		sfxindex%=64
+        sfx(sfxindex,1)
 	end
 	info = get_noteinfo(sfxindex,noteindex)
-    
 end
 
 function get_noteinfo(sfx_num,note_num)
